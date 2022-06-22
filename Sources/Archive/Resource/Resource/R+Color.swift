@@ -8,7 +8,9 @@
 import UIKit
 
 public extension R {
-    enum Color {
-        
-    }
+    enum Color { }
+}
+
+public extension R.Color {
+    
 }

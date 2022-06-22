@@ -8,7 +8,9 @@
 import Foundation
 
 public extension R {
-    enum Localizable {
-        
-    }
+    enum Localizable { }
+}
+
+public extension R.Localizable {
+    
 }

@@ -8,7 +8,9 @@
 import UIKit
 
 public extension R {
-    enum Icon {
-        
-    }
+    enum Icon { }
+}
+
+public extension R.Icon {
+    
 }

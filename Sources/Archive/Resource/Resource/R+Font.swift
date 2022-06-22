@@ -8,7 +8,9 @@
 import UIKit
 
 public extension R {
-    enum Font {
-        
-    }
+    enum Font { }
+}
+
+public extension R.Font {
+    
 }

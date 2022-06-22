@@ -8,7 +8,9 @@
 import UIKit
 
 public extension R {
-    enum Image {
-        
-    }
+    enum Image { }
+}
+
+public extension R.Image {
+    
 }
