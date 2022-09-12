@@ -6,8 +6,6 @@
 //
 
 import XCTest
-import Quick
-import Nimble
 import ReactorKit
 import Combine
 @testable import Archive
@@ -56,36 +54,37 @@ final class TestReactor: Reactor {
     // MARK: - Private
 }
 
-final class PublishedReactorTests: QuickSpec {
-    override func spec() {
-        describe("PublishedReactor에") {
-            context("Action을 보내면") {
-                it("상태가 바뀌어야한다.") {                    
-                    waitUntil { done in
-                        Task {
-                            // Given
-                            let reactor = TestReactor().publisher
-                            let expectation = [0, 1]
-                            var cancellable: AnyCancellable?
-                            
-                            let result: [Int] = await withUnsafeContinuation { continuation in
-                                cancellable = reactor.$state.map(\.count)
-                                    .removeDuplicates()
-                                    .collect(expectation.count)
-                                    .sink { continuation.resume(returning: $0) }
-                                
-                                // When
-                                reactor.action.send(.increase)
-                            }
-                            cancellable?.cancel()
-                            
-                            // Then
-                            expect(result).to(equal(expectation))
-                            done()
-                        }
-                    }
-                }
-            }
+final class PublishedReactorTests: XCTestCase {
+    // MARK: - Property
+    
+    // MARK: - Lifecycle
+    override func setUp() {
+        super.setUp()
+    }
+    
+    override func tearDown() {
+        super.tearDown()
+    }
+    
+    // MARK: - Test
+    func test_state_changed_when_send_action_to_reactor() async {
+        // Given
+        let reactor = TestReactor().publisher
+        let expectation = [0, 1]
+        var cancellable: AnyCancellable?
+        
+        let result: [Int] = await withUnsafeContinuation { continuation in
+            cancellable = reactor.$state.map(\.count)
+                .removeDuplicates()
+                .collect(expectation.count)
+                .sink { continuation.resume(returning: $0) }
+            
+            // When
+            reactor.action.send(.increase)
         }
+        cancellable?.cancel()
+        
+        // Then
+        XCTAssertEqual(result, expectation)
     }
 }

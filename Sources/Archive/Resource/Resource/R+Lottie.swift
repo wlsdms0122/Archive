@@ -8,7 +8,7 @@
 import Lottie
 
 public extension R {
-    enum Lotie { }
+    enum Lottie { }
 }
 
 public extension R.Lottie {

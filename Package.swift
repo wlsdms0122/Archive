@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -19,10 +19,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ReactorKit/ReactorKit", exact: "3.2.0"),
-        .package(url: "https://github.com/airbnb/lottie-ios.git", exact: "3.3.0"),
-        // Test
-        .package(url: "https://github.com/Quick/Quick", exact: "5.0.1"),
-        .package(url: "https://github.com/Quick/Nimble", exact: "10.0.0")
+        .package(url: "https://github.com/airbnb/lottie-ios.git", exact: "3.3.0")
     ],
     targets: [
         .target(
@@ -35,9 +32,7 @@ let package = Package(
         .testTarget(
             name: "ArchiveTests",
             dependencies: [
-                "Archive",
-                "Quick",
-                "Nimble"
+                "Archive"
             ]
         )
     ]
