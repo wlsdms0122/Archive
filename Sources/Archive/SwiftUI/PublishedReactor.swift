@@ -9,7 +9,7 @@ import Combine
 import RxSwift
 import ReactorKit
 
-public final class PublishedReactor<R: Reactor>: ObservableObject {
+public final class PublishedReactor<R: ReactorKit.Reactor>: ObservableObject {
     // MARK: - Property
     public let action = PassthroughSubject<R.Action, Never>()
     private var actionCancellable: AnyCancellable? {
@@ -43,7 +43,7 @@ public final class PublishedReactor<R: Reactor>: ObservableObject {
     // MARK: - Private
 }
 
-extension Reactor {
+extension ReactorKit.Reactor {
     public var publisher: PublishedReactor<Self> {
         get {
             PublishedReactor(self)
