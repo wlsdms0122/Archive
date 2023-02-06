@@ -1,5 +1,5 @@
 //
-//  R.swift
+//  Resource.swift
 //  
 //
 //  Created by jsilver on 2022/06/22.

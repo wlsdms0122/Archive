@@ -1,5 +1,5 @@
 //
-//  R+Image.swift
+//  Resource+Image.swift
 //  
 //
 //  Created by jsilver on 2022/06/22.
@@ -7,10 +7,10 @@
 
 import UIKit
 
-public extension R {
+public extension Resource {
     enum Image { }
 }
 
-public extension R.Image {
+public extension Resource.Image {
     
 }

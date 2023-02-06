@@ -1,5 +1,5 @@
 //
-//  R+Lottie.swift
+//  Resource+Lottie.swift
 //  
 //
 //  Created by jsilver on 2022/06/22.
@@ -7,10 +7,10 @@
 
 import Lottie
 
-public extension R {
+public extension Resource {
     enum Lottie { }
 }
 
-public extension R.Lottie {
+public extension Resource.Lottie {
     
 }

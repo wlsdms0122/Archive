@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  
+
+  Created by jsilver on 2021/03/17.
+  
+*/
+
+// MARK: - App
+"app_name" = "Resource";
