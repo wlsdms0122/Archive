@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "compose",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wlsdms0122/Compose.git",
+      "state" : {
+        "revision" : "6841f603b3bae0e9cbf66e684a220463248841b7",
+        "version" : "1.2.1"
+      }
+    },
+    {
       "identity" : "lottie-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-ios.git",
