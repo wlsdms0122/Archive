@@ -73,9 +73,12 @@ public class IntrinsicContentView<View: UIView>: UIView {
         ]
             .forEach { addSubview($0) }
         
-        content.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
+        NSLayoutConstraint.activate([
+            content.topAnchor.constraint(equalTo: topAnchor),
+            content.trailingAnchor.constraint(equalTo: trailingAnchor),
+            content.bottomAnchor.constraint(equalTo: bottomAnchor),
+            content.leadingAnchor.constraint(equalTo: leadingAnchor)
+        ])
     }
     
     private func setUpState() {
