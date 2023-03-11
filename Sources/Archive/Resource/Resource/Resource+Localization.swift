@@ -1,5 +1,5 @@
 //
-//  Resource+Localizable.swift
+//  Resource+Localization.swift
 //  
 //
 //  Created by jsilver on 2022/06/22.
@@ -8,9 +8,9 @@
 import Foundation
 
 public extension Resource {
-    enum Localizable { }
+    enum Localization { }
 }
 
-public extension Resource.Localizable {
+public extension Resource.Localization {
     
 }
