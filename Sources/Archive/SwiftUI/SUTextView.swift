@@ -1,5 +1,5 @@
 //
-//  UITextFieldView.swift
+//  SUTextView.swift
 //
 //
 //  Created by JSilver on 2023/02/21.
@@ -8,34 +8,50 @@
 import UIKit
 import SwiftUI
 import Compose
+import Validator
 
-public struct UITextFieldView: UIViewRepresentable {
-    public final class Coordinator: NSObject, UITextFieldDelegate {
+public struct SUTextView: UIViewRepresentable {
+    public final class Coordinator: NSObject, UITextViewDelegate {
         // MARK: - Property
+        @Binding
+        var text: String
+        
+        var validator: (any Validator<String>)?
         private var inputAccessoryViewCache: ComposableView?
         
-        public var onReturn: (() -> Void)?
         private let isEditing: Binding<Bool>?
         
         // MARK: - Initializer
-        init(isEditing: Binding<Bool>?) {
+        init(text: Binding<String>, isEditing: Binding<Bool>?) {
+            self._text = text
             self.isEditing = isEditing
         }
         
         // MARK: - Lifecycle
-        public func textFieldDidBeginEditing(_ textField: UITextField) {
+        public func textViewDidBeginEditing(_ textView: UITextView) {
             guard !(isEditing?.wrappedValue ?? false) else { return }
             isEditing?.wrappedValue = true
         }
         
-        public func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        public func textViewDidEndEditing(_ textView: UITextView) {
             guard isEditing?.wrappedValue ?? false else { return }
             isEditing?.wrappedValue = false
         }
         
-        public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            onReturn?()
-            return true
+        public func textViewDidChange(_ textView: UITextView) {
+            text = textView.text
+        }
+        
+        public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+            guard let newString = (textView.text as NSString?)?.replacingCharacters(in: range, with: text) else { return true }
+            
+            guard !newString.isEmpty else {
+                // Empty string always true.
+                return true
+            }
+            
+            // Validate new string.
+            return validator?.validate(newString) ?? true
         }
         
         // MARK: - Public
@@ -73,12 +89,14 @@ public struct UITextFieldView: UIViewRepresentable {
     }
     
     // MARK: - Property
-    public var placeholder: String?
-    public var textColor: UIColor?
+    @Binding
+    public var text: String
     public var tintColor: UIColor?
+    public var textColor: UIColor?
     public var font: UIFont?
     
-    public var isSecureTextEntry: Bool = false
+    public var scrollIndicatorInsets: UIEdgeInsets = .zero
+    
     public var isAutocorrection: Bool = false
     public var isSpellChecking: Bool = false
     public var autocapitalization: UITextAutocapitalizationType = .none
@@ -89,45 +107,44 @@ public struct UITextFieldView: UIViewRepresentable {
     public var inputAccessoryViewHeight: CGFloat = 0
     public var inputAccessoryView: (any View)? = nil
     
-    public var isEditing: Binding<Bool>?
+    public var validator: (any Validator<String>)?
     
-    public var onReturn: (() -> Void)?
-    
-    @Binding
-    public var text: String
+    @OptionalState
+    public var isEditing: Bool = false
     
     // MARK: - Initializer
-    public init(_ placeholder: String? = nil, text: Binding<String>) {
-        self.placeholder = placeholder
+    public init(text: Binding<String>) {
         self._text = text
     }
     
     // MARK: - Lifecycle
-    public func makeUIView(context: Context) -> UITextField {
-        let view = UITextField()
+    public func makeUIView(context: Context) -> UITextView {
+        let view = UITextView()
         view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         
         view.delegate = context.coordinator
         
-        view.addAction(
-            UIAction { _ in
-                text = view.text ?? ""
-            },
-            for: [.editingChanged, .valueChanged]
-        )
+        view.backgroundColor = .clear
+        view.clipsToBounds = false
+        
+        // Remove horizontal padding.
+        view.textContainer.lineFragmentPadding = 0
+        // Remote vertical padding.
+        view.textContainerInset = .zero
         
         return view
     }
     
-    public func updateUIView(_ uiView: UITextField, context: Context) {
+    public func updateUIView(_ uiView: UITextView, context: Context) {
         uiView.text = text
-        uiView.placeholder = placeholder
-        uiView.textColor = textColor
+        
         uiView.tintColor = tintColor
+        uiView.textColor = textColor
         uiView.font = font
         
-        uiView.isSecureTextEntry = isSecureTextEntry
+        uiView.scrollIndicatorInsets = scrollIndicatorInsets
+        
         uiView.autocorrectionType = isAutocorrection ? .yes : .no
         uiView.spellCheckingType = isSpellChecking ? .yes : .no
         uiView.autocapitalizationType = autocapitalization
@@ -141,13 +158,13 @@ public struct UITextFieldView: UIViewRepresentable {
                 inputAccessoryView
             )
         
-        context.coordinator.onReturn = onReturn
+        context.coordinator.validator = validator
         
-        if (isEditing?.wrappedValue ?? false) && !uiView.isFirstResponder {
+        if isEditing && !uiView.isFirstResponder {
             Task {
                 uiView.becomeFirstResponder()
             }
-        } else if !(isEditing?.wrappedValue ?? false) && uiView.isFirstResponder {
+        } else if !isEditing && uiView.isFirstResponder {
             Task {
                 uiView.resignFirstResponder()
             }
@@ -155,19 +172,19 @@ public struct UITextFieldView: UIViewRepresentable {
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator(isEditing: isEditing)
+        Coordinator(text: $text, isEditing: $isEditing)
     }
     
     // MARK: - Public
-    public func textColor(_ color: UIColor?) -> Self {
-        var view = self
-        view.textColor = color
-        return view
-    }
-    
     public func tintColor(_ color: UIColor?) -> Self {
         var view = self
         view.tintColor = color
+        return view
+    }
+    
+    public func textColor(_ color: UIColor?) -> Self {
+        var view = self
+        view.textColor = color
         return view
     }
     
@@ -177,9 +194,9 @@ public struct UITextFieldView: UIViewRepresentable {
         return view
     }
     
-    public func secureTextEntry(_ isSecureTextEntry: Bool) -> Self {
+    public func scrollIndicatorInsets(_ insets: UIEdgeInsets) -> Self {
         var view = self
-        view.isSecureTextEntry = isSecureTextEntry
+        view.scrollIndicatorInsets = insets
         return view
     }
     
@@ -227,15 +244,15 @@ public struct UITextFieldView: UIViewRepresentable {
         )
     }
     
-    public func editing(_ isEditing: Binding<Bool>) -> Self {
+    public func validator(_ validator: (any Validator<String>)?) -> Self {
         var view = self
-        view.isEditing = isEditing
+        view.validator = validator
         return view
     }
     
-    public func onReturn(_ onReturn: @escaping () -> Void) -> Self {
+    public func editing(_ isEditing: Binding<Bool>) -> Self {
         var view = self
-        view.onReturn = onReturn
+        view._isEditing.bind(isEditing)
         return view
     }
     
