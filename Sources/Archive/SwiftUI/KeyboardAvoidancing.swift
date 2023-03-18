@@ -1,5 +1,5 @@
 //
-//  OnKeyboardStateChangeModifier.swift
+//  KeyboardAvoidancing.swift
 //
 //
 //  Created by JSilver on 2023/03/11.
@@ -82,15 +82,15 @@ struct OnKeyboardAvoidancingChangedModifier: ViewModifier {
     // MARK: - Lifecycle
     func body(content: Content) -> some View {
         var adjustedOffset: CGFloat = 0
-        if let viewOffset = viewFrame?.maxY,
-           let keyboardOffset = keyboardFrame?.minY,
+        if let viewFrame = viewFrame,
+           let keyboardFrame = keyboardFrame,
            let keyboardState = keyboardState {
             switch keyboardState {
             case .willShow, .didShow:
-                adjustedOffset = max(viewOffset - keyboardOffset + offset, 0)
+                adjustedOffset = min(max(viewFrame.maxY - keyboardFrame.minY + offset, 0), keyboardFrame.height + offset)
                 
-            case .willHide, .didHide:
-                adjustedOffset = max(viewOffset - keyboardOffset, 0)
+            default:
+                break
             }
         }
         
