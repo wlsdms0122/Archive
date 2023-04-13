@@ -71,7 +71,10 @@ public class IntrinsicContentView<View: UIView>: UIView {
         [
             content
         ]
-            .forEach { addSubview($0) }
+            .forEach {
+                $0.translatesAutoresizingMaskIntoConstraints = false
+                addSubview($0)
+            }
         
         NSLayoutConstraint.activate([
             content.topAnchor.constraint(equalTo: topAnchor),
