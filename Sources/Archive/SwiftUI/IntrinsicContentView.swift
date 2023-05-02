@@ -41,7 +41,7 @@ public class IntrinsicContentView<View: UIView>: UIView {
     }
     
     // MARK: - Initializer
-    init(_ content: View) {
+    public init(_ content: View) {
         self.content = content
         super.init(frame: .zero)
         
