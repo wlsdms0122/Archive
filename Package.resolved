@@ -37,6 +37,15 @@
       }
     },
     {
+      "identity" : "validator",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wlsdms0122/Validator.git",
+      "state" : {
+        "revision" : "fe821b2e3276c12d33f4d67711d6462f87c25a80",
+        "version" : "1.0.3"
+      }
+    },
+    {
       "identity" : "weakmaptable",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ReactorKit/WeakMapTable.git",
