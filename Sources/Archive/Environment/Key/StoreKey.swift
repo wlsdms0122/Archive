@@ -7,10 +7,10 @@
 
 import Foundation
 
-public typealias Key = Environment.Key.Key
+public typealias StoreKey = Environment.Key.Store
 
 public extension Environment.Key {
-    struct Key: Decodable, Equatable {
+    struct Store: Decodable, Equatable {
         // MARK: - Property
         public let rawValue: String
         public let description: String?
@@ -38,6 +38,6 @@ public extension Environment.Key {
     }
 }
 
-public extension Environment.Key.Key {
+public extension Environment.Key.Store {
     
 }
