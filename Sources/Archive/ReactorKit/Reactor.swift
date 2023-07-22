@@ -9,16 +9,16 @@ import Foundation
 import Combine
 import RxSwift
 
-public protocol Store {
+public protocol Flow {
     associatedtype Action
     associatedtype Mutation
     associatedtype State
 }
 
-open class Reactor<E: Store>: ObservableObject {
-    public typealias Action = E.Action
-    public typealias Mutation = E.Mutation
-    public typealias State = E.State
+open class Reactor<F: Flow>: ObservableObject {
+    public typealias Action = F.Action
+    public typealias Mutation = F.Mutation
+    public typealias State = F.State
     
     // MARK: - Property
     public let action = PublishSubject<Action>()
