@@ -10,7 +10,7 @@ import ReactorKit
 import Combine
 @testable import Archive
 
-final class TestReactor: Reactor {
+final class TestReactor: ReactorKit.Reactor {
     enum Action {
         case increase
     }
