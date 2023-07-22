@@ -12,5 +12,12 @@ public typealias Env = Environment
 public enum Environment { }
 
 public extension Environment {
+    enum Configuration {
+        case develop
+        case staging
+        case live
+        case deploy
+    }
+    
     static var config: Configuration = .deploy
 }
