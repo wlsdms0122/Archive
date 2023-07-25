@@ -17,4 +17,15 @@ public extension Binding {
             set: { object[keyPath: path] = $0 }
         )
     }
+    
+    static func object<T: ObservableObject>(
+        _ object: T,
+        path: ReferenceWritableKeyPath<T, Value>,
+        set: @escaping (Value) -> Void
+    ) -> Binding<Value> {
+        .init(
+            get: { object[keyPath: path] },
+            set: { set($0) }
+        )
+    }
 }
