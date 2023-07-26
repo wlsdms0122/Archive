@@ -20,7 +20,7 @@ public extension Binding {
     
     static func object<T: ObservableObject>(
         _ object: T,
-        path: ReferenceWritableKeyPath<T, Value>,
+        path: KeyPath<T, Value>,
         set: @escaping (Value) -> Void
     ) -> Binding<Value> {
         .init(
