@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GraphQLQuery: Encodable {
+public struct GraphQLQuery: Encodable {
     struct AnyEncodable: Encodable {
         // MARK: - Property
         let value: Any
@@ -37,12 +37,12 @@ struct GraphQLQuery: Encodable {
     }
     
     // MARK: - Property
-    let query: String
-    let operationName: String
-    let variables: [String: any Encodable]
+    public let query: String
+    public let operationName: String
+    public let variables: [String: any Encodable]
     
     // MARK: - Initializer
-    init(
+    public init(
         query: String,
         operationName: String = "",
         variables: [String: any Encodable] = [:]
@@ -54,7 +54,7 @@ struct GraphQLQuery: Encodable {
     }
     
     // MARK: - Lifecycle
-    func encode(to encoder: Swift.Encoder) throws {
+    public func encode(to encoder: Swift.Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
         try container.encode(query, forKey: .query)
