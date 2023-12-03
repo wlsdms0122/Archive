@@ -5,8 +5,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/Compose.git",
       "state" : {
-        "revision" : "7faab8d6adc1d080636defb47f7da8c7614c5e07",
-        "version" : "1.5.0"
+        "revision" : "cecbf976de39433fa48f17af2b11c9e63e92b866",
+        "version" : "1.6.1"
+      }
+    },
+    {
+      "identity" : "jstoast",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wlsdms0122/JSToast.git",
+      "state" : {
+        "revision" : "3d2b1d8897c135baf20db6193b12e0b26dd232e5",
+        "version" : "2.6.6"
       }
     },
     {
@@ -41,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/Storage.git",
       "state" : {
-        "revision" : "68fe51f0ca512e7358c7a600104224c84c637700",
-        "version" : "1.0.2"
+        "revision" : "edc247b5972246a2a624ef7e413f7df97bf06724",
+        "version" : "1.2.0"
       }
     },
     {
