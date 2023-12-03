@@ -18,6 +18,7 @@ let package = Package(
         )
     ],
     dependencies: [
+        .package(url: "https://github.com/wlsdms0122/Reducer.git", exact: "2.1.0"),
         .package(url: "https://github.com/wlsdms0122/Compose.git", exact: "1.6.1"),
         .package(url: "https://github.com/wlsdms0122/JSToast.git", exact: "2.6.6"),
         .package(url: "https://github.com/wlsdms0122/Storage.git", exact: "1.2.0"),
@@ -29,6 +30,7 @@ let package = Package(
         .target(
             name: "Archive",
             dependencies: [
+                "Reducer",
                 "Compose",
                 "JSToast",
                 "Storage",

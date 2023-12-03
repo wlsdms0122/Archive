@@ -37,6 +37,15 @@
       }
     },
     {
+      "identity" : "reducer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/wlsdms0122/Reducer.git",
+      "state" : {
+        "revision" : "7a4895ab0dc8968e99b0f35f5694aa417a6d91cf",
+        "version" : "2.1.0"
+      }
+    },
+    {
       "identity" : "rxswift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ReactiveX/RxSwift.git",
@@ -52,6 +61,15 @@
       "state" : {
         "revision" : "edc247b5972246a2a624ef7e413f7df97bf06724",
         "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax.git",
+      "state" : {
+        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
+        "version" : "509.0.2"
       }
     },
     {
