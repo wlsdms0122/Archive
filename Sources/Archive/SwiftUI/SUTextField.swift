@@ -74,7 +74,10 @@ public struct SUTextField: UIViewRepresentable {
                     disableSafeArea: true,
                     inputAccessoryView
                 )
-                self.inputAccessoryViewCache = composableView
+                
+                Task {
+                    self.inputAccessoryViewCache = composableView
+                }
                 
                 return composableView
             }
