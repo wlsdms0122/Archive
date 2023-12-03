@@ -147,7 +147,7 @@ public struct SUTextField: UIViewRepresentable {
             uiView.attributedPlaceholder = NSAttributedString(
                 string: placeholder,
                 attributes: [
-                    .foregroundColor: placeholderColor as Any
+                    .foregroundColor: placeholderColor ?? UIColor.placeholderText
                 ]
             )
         }
