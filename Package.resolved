@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/JSToast.git",
       "state" : {
-        "revision" : "3d2b1d8897c135baf20db6193b12e0b26dd232e5",
-        "version" : "2.6.6"
+        "revision" : "daa55dfcb1dbd13fd8d132801eb930b81f9f6922",
+        "version" : "2.7.0"
       }
     },
     {

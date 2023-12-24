@@ -2,7 +2,7 @@
 //  AlertViewModifier.swift
 //
 //
-//  Created by jsilver on 12/3/23.
+//  Created by JSilver on 2023/03/21.
 //
 
 import SwiftUI
@@ -15,6 +15,7 @@ public enum AlertStrategy {
     case ignore
 }
 
+@MainActor
 final class AlertQueue: ObservableObject {
     // MARK: - Property
     private static var queues: [UIWindowScene?: AlertQueue] = [:]
@@ -48,8 +49,13 @@ final class AlertQueue: ObservableObject {
         queue.removeLast()
     }
     
-    func removeAll() {
-        queue.removeAll()
+    func removeAll(id: Namespace.ID? = nil) {
+        guard let id = id else {
+            queue.removeAll()
+            return
+        }
+        
+        queue.removeAll { item in item.0 == id }
     }
     
     func reset() {
@@ -72,16 +78,12 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
     
     @Namespace
     private var id: Namespace.ID
-    @State
-    private var isShow: Bool = false
-    @State
-    private var scene: UIWindowScene?
     
     // MARK: - Initializer
     init<P: Publisher>(
         _ publisher: P,
-        duration: TimeInterval? = nil,
-        strategy: AlertStrategy = .queue,
+        duration: TimeInterval?,
+        strategy: AlertStrategy,
         @ViewBuilder alert: @escaping (Data, _ dismiss: @escaping ((() -> Void)?) -> Void) -> Alert
     ) where P.Output == Data, P.Failure == Never {
         self.publisher = publisher.eraseToAnyPublisher()
@@ -93,77 +95,69 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
     // MARK: - Lifecycle
     func body(content: Content) -> some View {
         content.background(
-            ToastContainer { layer in
-                if let view = layer.view {
-                    Group {
-                        if let scene = scene {
-                            let queue = AlertQueue.queue(scene: scene)
-                            
-                            GeometryReader { reader in
-                                let frame = reader.frame(in: .global)
-                                
-                                Color.clear
-                                    .toast(
-                                        $isShow,
-                                        duration: duration,
-                                        layouts: [
-                                            .inside(.top),
-                                            .inside(.trailing),
-                                            .inside(.bottom),
-                                            .inside(.leading)
-                                        ],
-                                        showAnimation: .fadeIn(duration: 0.25),
-                                        hideAnimation: .fadeOut(duration: 0.25),
-                                        hidden: { _ in
-                                            queue.check()
-                                        }
-                                    ) {
-                                        if let data = queue.item?.data as? Data {
-                                            var completion: (() -> Void)?
-                                            
-                                            alert(data) {
-                                                completion = $0
-                                                
-                                                queue.remove()
-                                                queue.reset()
-                                            }
-                                                .onDisappear {
-                                                    completion?()
-                                                }
-                                        }
+            ToastLayerReader { layer in
+                ToastReader { toaster in
+                    if let scene = layer.scene {
+                        let queue = AlertQueue.queue(scene: scene)
+                        
+                        Color.clear
+                            .subscribe(queue.$item) { item in
+                                guard let data = item?.data as? Data, item?.id == id else {
+                                    // If current alert data isn't own, hide current alert.
+                                    toaster.hide(animation: .fadeOut(duration: 0.25)) { _ in
+                                        queue.check()
                                     }
-                                        .offset(
-                                            x: -frame.minX,
-                                            y: -frame.minY
-                                        )
+                                    
+                                    return
+                                }
+                                
+                                // If current alert data is own, show new alert.
+                                var completion: (() -> Void)?
+                                toaster.show(
+                                    layouts: [
+                                        .inside(.top),
+                                        .inside(.trailing),
+                                        .inside(.bottom),
+                                        .inside(.leading)
+                                    ],
+                                    scene: layer,
+                                    showAnimation: .fadeIn(duration: 0.25),
+                                    hideAnimation: .fadeOut(duration: 0.25),
+                                    hidden: { _ in
+                                        // Check next alert data and call completion handler.
+                                        queue.check()
+                                        completion?()
+                                    }
+                                ) {
+                                    alert(data) {
+                                        completion = $0
+                                        
+                                        // If user confirm alert remove current item and reset to hide.
+                                        queue.remove()
+                                        queue.reset()
+                                    }
+                                }
                             }
-                                .frame(
-                                    width: scene.screen.bounds.width,
-                                    height: scene.screen.bounds.height
-                                )
-                                .subscribe(queue.$item) { item in
-                                    guard item?.id == id else {
-                                        isShow = false
+                            .onDisappear {
+                                // If the request view has disappeared, remove all data that occurred on view(id),
+                                // and reset to hide the current alert. Check the next alert data after animation completion.
+                                queue.removeAll(id: id)
+                                queue.reset()
+                                
+                                toaster.hide(animation: .fadeOut(duration: 0.25)) { _ in
+                                    queue.check()
+                                }
+                            }
+                            .subscribe(publisher) { data in
+                                Task {
+                                    guard !queue.isEmpty else {
+                                        // Insert data into alert queue and check it to present immediatly if queue is empty.
+                                        queue.insert(data, for: id)
+                                        queue.check()
                                         return
                                     }
                                     
-                                    isShow = (item?.data as? Data) != nil
-                                }
-                        }
-                    }
-                        .subscribe(view.publisher(for: \.window?.windowScene)) { scene in
-                            self.scene = scene
-                        }
-                        .subscribe(publisher) { data in
-                            guard let scene = scene else { return }
-                            
-                            let queue = AlertQueue.queue(scene: scene)
-                            
-                            Task {
-                                if queue.isEmpty {
-                                    queue.insert(data, for: id)
-                                    queue.check()
-                                } else {
+                                    // If queue isn't empty, insert data through queue strategy.
                                     switch strategy {
                                     case .queue:
                                         queue.insert(data, for: id)
@@ -179,7 +173,7 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                                     }
                                 }
                             }
-                        }
+                    }
                 }
             }
         )
@@ -216,54 +210,54 @@ private struct Preview: View {
         Button("Show Alert") {
             alert.send(Void())
         }
-            .buttonStyle(.borderedProminent)
-            .fixedSize()
-            .alert(alert) { _, dismiss in
-                ZStack {
-                    Color.black.opacity(0.4)
-                    
+        .buttonStyle(.borderedProminent)
+        .fixedSize()
+        .alert(alert) { _, dismiss in
+            ZStack {
+                Color.black.opacity(0.4)
+                
+                VStack(spacing: 2) {
                     VStack(spacing: 2) {
-                        VStack(spacing: 2) {
-                            Text("A Short Title Is Best")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                                .padding(.top, 21.5)
-                                .padding(.bottom, 2.5)
-                            Text("A message should be a short, complete sentence.")
-                                .multilineTextAlignment(.center)
-                                .font(.footnote)
-                                .foregroundColor(.primary)
-                                .padding(.top, 2.5)
-                                .padding(.bottom, 17.5)
+                        Text("A Short Title Is Best")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .padding(.top, 21.5)
+                            .padding(.bottom, 2.5)
+                        Text("A message should be a short, complete sentence.")
+                            .multilineTextAlignment(.center)
+                            .font(.footnote)
+                            .foregroundColor(.primary)
+                            .padding(.top, 2.5)
+                            .padding(.bottom, 17.5)
+                    }
+                    VStack(spacing: 0) {
+                        Divider()
+                        Button {
+                            dismiss(nil)
+                        } label: {
+                            Text("Action")
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundColor(.blue)
+                                .frame(height: 44)
+                                .frame(maxWidth: .infinity)
                         }
-                        VStack(spacing: 0) {
-                            Divider()
-                            Button {
-                                dismiss(nil)
-                            } label: {
-                                Text("Action")
-                                    .font(.system(size: 17, weight: .bold))
-                                    .foregroundColor(.blue)
-                                    .frame(height: 44)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            Divider()
-                            Button {
-                                dismiss(nil)
-                            } label: {
-                                Text("Action")
-                                    .font(.system(size: 17, weight: .regular))
-                                    .foregroundColor(.blue)
-                                    .frame(height: 44)
-                                    .frame(maxWidth: .infinity)
-                            }
+                        Divider()
+                        Button {
+                            dismiss(nil)
+                        } label: {
+                            Text("Action")
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.blue)
+                                .frame(height: 44)
+                                .frame(maxWidth: .infinity)
                         }
                     }
-                    .frame(width: 247)
-                    .background(.regularMaterial)
-                    .cornerRadius(14)
                 }
+                .frame(width: 247)
+                .background(.regularMaterial)
+                .cornerRadius(14)
             }
+        }
     }
     
     let alert = PassthroughSubject<Void, Never>()
