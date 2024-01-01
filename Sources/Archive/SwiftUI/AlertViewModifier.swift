@@ -99,20 +99,24 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                 ToastReader { toaster in
                     if let scene = layer.scene {
                         let queue = AlertQueue.queue(scene: scene)
+                        var completion: (() -> Void)?
                         
                         Color.clear
                             .subscribe(queue.$item) { item in
                                 guard let data = item?.data as? Data, item?.id == id else {
                                     // If current alert data isn't own, hide current alert.
                                     toaster.hide(animation: .fadeOut(duration: 0.25)) { _ in
+                                        // Check next alert data and call completion handler.
                                         queue.check()
+                                        
+                                        completion?()
+                                        completion = nil
                                     }
                                     
                                     return
                                 }
                                 
                                 // If current alert data is own, show new alert.
-                                var completion: (() -> Void)?
                                 toaster.show(
                                     layouts: [
                                         .inside(.top),
@@ -121,13 +125,7 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                                         .inside(.leading)
                                     ],
                                     scene: layer,
-                                    showAnimation: .fadeIn(duration: 0.25),
-                                    hideAnimation: .fadeOut(duration: 0.25),
-                                    hidden: { _ in
-                                        // Check next alert data and call completion handler.
-                                        queue.check()
-                                        completion?()
-                                    }
+                                    showAnimation: .fadeIn(duration: 0.25)
                                 ) {
                                     alert(data) {
                                         completion = $0
