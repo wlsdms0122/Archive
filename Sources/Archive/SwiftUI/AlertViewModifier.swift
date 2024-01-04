@@ -136,16 +136,6 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                                     }
                                 }
                             }
-                            .onDisappear {
-                                // If the request view has disappeared, remove all data that occurred on view(id),
-                                // and reset to hide the current alert. Check the next alert data after animation completion.
-                                queue.removeAll(id: id)
-                                queue.reset()
-                                
-                                toaster.hide(animation: .fadeOut(duration: 0.25)) { _ in
-                                    queue.check()
-                                }
-                            }
                             .subscribe(publisher) { data in
                                 Task {
                                     guard !queue.isEmpty else {
