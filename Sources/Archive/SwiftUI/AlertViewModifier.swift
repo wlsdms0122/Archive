@@ -70,11 +70,32 @@ final class AlertQueue: ObservableObject {
 }
 
 struct AlertViewModifier<Data, Alert: View>: ViewModifier {
+    private final class CompletionHandler: ObservableObject {
+        // MARK: - Property
+        private var handler: (() -> Void)?
+        
+        // MARK: - Initializer
+        
+        // MARK: - Public
+        func callAsFunction() {
+            handler?()
+        }
+        
+        func set(_ handler: (() -> Void)? = nil) {
+            self.handler = handler
+        }
+        
+        // MARK: - Private
+    }
+    
     // MARK: - Property
     private let publisher: AnyPublisher<Data, Never>
     private let duration: TimeInterval?
     private let strategy: AlertStrategy
     private let alert: (Data, _ dismiss: @escaping ((() -> Void)?) -> Void) -> Alert
+    
+    @StateObject
+    private var completion = CompletionHandler()
     
     @Namespace
     private var id: Namespace.ID
@@ -99,7 +120,6 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                 ToastReader { toaster in
                     if let scene = layer.scene {
                         let queue = AlertQueue.queue(scene: scene)
-                        var completion: (() -> Void)?
                         
                         Color.clear
                             .subscribe(queue.$item) { item in
@@ -109,8 +129,8 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                                         // Check next alert data and call completion handler.
                                         queue.check()
                                         
-                                        completion?()
-                                        completion = nil
+                                        completion()
+                                        completion.set()
                                     }
                                     
                                     return
@@ -128,8 +148,7 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
                                     showAnimation: .fadeIn(duration: 0.25)
                                 ) {
                                     alert(data) {
-                                        completion = $0
-                                        
+                                        completion.set($0)
                                         // If user confirm alert remove current item and reset to hide.
                                         queue.remove()
                                         queue.reset()
@@ -173,6 +192,7 @@ struct AlertViewModifier<Data, Alert: View>: ViewModifier {
 }
 
 public extension View {
+    @MainActor
     func alert<
         Data,
         P: Publisher,
