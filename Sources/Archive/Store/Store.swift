@@ -12,7 +12,7 @@ import Storage
 @propertyWrapper
 public struct Store<Value: Codable> {
     // MARK: - Property
-    private let queue = DispatchQueue(label: "com.chaltteok-studio.store")
+    private let queue = DispatchQueue(label: "com.jsilver.store")
     
     private let storage: any Storage
     private let key: StoreKey
