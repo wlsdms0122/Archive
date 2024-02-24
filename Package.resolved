@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/Compose.git",
       "state" : {
-        "revision" : "cecbf976de39433fa48f17af2b11c9e63e92b866",
-        "version" : "1.6.1"
+        "revision" : "0f32f5ef9eb13ef9e6b8c1aed0964fc12181d8c5",
+        "version" : "1.7.0"
       }
     },
     {
@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/JSToast.git",
       "state" : {
-        "revision" : "daa55dfcb1dbd13fd8d132801eb930b81f9f6922",
-        "version" : "2.7.0"
+        "revision" : "f89cc46a62f6dadd7034ba37b775843653a22e8e",
+        "version" : "2.7.2"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/wlsdms0122/Reducer.git",
       "state" : {
-        "revision" : "7a4895ab0dc8968e99b0f35f5694aa417a6d91cf",
-        "version" : "2.1.0"
+        "revision" : "a9d68838ef1317e68c79ce883412c5351d7a166a",
+        "version" : "2.2.0"
       }
     },
     {

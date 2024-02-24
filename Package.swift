@@ -18,9 +18,9 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/wlsdms0122/Reducer.git", exact: "2.1.0"),
-        .package(url: "https://github.com/wlsdms0122/Compose.git", exact: "1.6.1"),
-        .package(url: "https://github.com/wlsdms0122/JSToast.git", exact: "2.7.0"),
+        .package(url: "https://github.com/wlsdms0122/Reducer.git", exact: "2.2.0"),
+        .package(url: "https://github.com/wlsdms0122/Compose.git", exact: "1.7.0"),
+        .package(url: "https://github.com/wlsdms0122/JSToast.git", exact: "2.7.2"),
         .package(url: "https://github.com/wlsdms0122/Storage.git", exact: "1.2.0"),
         .package(url: "https://github.com/wlsdms0122/Validator.git", exact: "1.0.3"),
         .package(url: "https://github.com/ReactorKit/ReactorKit.git", exact: "3.2.0"),
